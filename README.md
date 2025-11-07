@@ -2,6 +2,8 @@
 
 A Python script to transform Revolut transaction (in USD) CSV exports into GBP equivalent transaction statements.
 
+(generated with Claude Code)
+
 ## Features
 
 - **GBP Conversion**: Automatically converts all transactions to GBP equivalents
