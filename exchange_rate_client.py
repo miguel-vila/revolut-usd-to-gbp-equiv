@@ -9,6 +9,7 @@ import json
 import urllib.request
 import urllib.error
 from datetime import date, datetime
+from functools import lru_cache
 from typing import Optional
 
 
@@ -17,9 +18,12 @@ class ExchangeRateError(Exception):
     pass
 
 
+@lru_cache(maxsize=128)
 def get_exchange_rate_to_gbp(currency: str, date_str: str) -> float:
     """
     Get the exchange rate from a currency to GBP for a specific date.
+
+    Results are cached in memory to avoid redundant API calls for the same date.
 
     Args:
         currency: Source currency code (e.g., 'EUR', 'USD', 'JPY')

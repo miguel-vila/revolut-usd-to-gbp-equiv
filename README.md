@@ -8,7 +8,8 @@ A Python script to transform Revolut transaction CSV exports into GBP equivalent
   - Uses daily exchange rates from Frankfurter API (European Central Bank data)
   - Smart handling: GBP transactions use original amount, others converted via USD→GBP
   - Works with multi-currency transactions (USD, EUR, COP, etc.)
-- Filters Revolut CSV exports to keep only relevant columns
+  - In-memory caching for exchange rates (avoids redundant API calls for same-day transactions)
+- **Simple Output**: Produces clean CSV with only essential columns (date, description, amount gbp)
 - Sorts transactions by date (oldest first)
 - Handles missing columns gracefully with clear error messages
 - Automatically generates output filename with `_processed` suffix
@@ -28,14 +29,14 @@ uv sync
 
 ### Basic usage (output file auto-generated):
 ```bash
-uv run python main.py transactions.csv 1000.00
+uv run python main.py transactions.csv
 ```
 
-This will create `transactions_processed.csv` in the same directory, starting with an initial GBP balance of 1000.00.
+This will create `transactions_processed.csv` in the same directory.
 
 ### Specify output file:
 ```bash
-uv run python main.py transactions.csv 1500.50 -o output.csv
+uv run python main.py transactions.csv -o output.csv
 ```
 
 ### Get help:
@@ -45,13 +46,11 @@ uv run python main.py --help
 
 ## Output Columns
 
-The script produces a clean CSV with the following columns (all numeric values rounded to 2 decimal places):
+The script produces a clean CSV with the following columns:
 
 1. **date** - Transaction date
 2. **description** - Transaction description
-3. **amount** - Transaction amount in USD (account currency)
-4. **balance** - Account balance in USD
-5. **amount gbp** - Transaction amount converted to GBP
+3. **amount gbp** - Transaction amount converted to GBP (rounded to 2 decimal places)
 
 ## Future Enhancements
 
@@ -67,7 +66,7 @@ The script is designed to be easily extended with:
 Main script for processing Revolut CSV exports with column filtering and sorting.
 
 ### exchange_rate_client.py
-Standalone client for fetching daily exchange rates to GBP using the Frankfurter API (European Central Bank data). Uses only Python standard library (no external dependencies).
+Standalone client for fetching daily exchange rates to GBP using the Frankfurter API (European Central Bank data). Uses only Python standard library (no external dependencies). Includes LRU cache to avoid redundant API calls for the same date.
 
 Can be tested independently:
 ```bash

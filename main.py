@@ -67,14 +67,13 @@ def calculate_gbp_amount(row) -> float:
         return 0.0
 
 
-def process_revolut_csv(input_file: Path, output_file: Path, initial_balance_gbp: float) -> None:
+def process_revolut_csv(input_file: Path, output_file: Path) -> None:
     """
     Process Revolut CSV export, transforming to GBP equivalent statement.
 
     Args:
         input_file: Path to the input CSV file
         output_file: Path to the output CSV file
-        initial_balance_gbp: Initial GBP balance for the statement
     """
     try:
         # Read the CSV file
@@ -100,19 +99,15 @@ def process_revolut_csv(input_file: Path, output_file: Path, initial_balance_gbp
         print("Calculating GBP amounts...")
         df_filtered["Amount GBP"] = df_filtered.apply(calculate_gbp_amount, axis=1)
 
-        # Round numeric columns to 2 decimal places
-        df_filtered["Amount"] = df_filtered["Amount"].round(2)
-        df_filtered["Balance"] = df_filtered["Balance"].round(2)
+        # Round to 2 decimal places
         df_filtered["Amount GBP"] = df_filtered["Amount GBP"].round(2)
 
         # Select only the columns we want in the output
-        output_columns = ["Date completed (UTC)", "Description", "Amount", "Balance", "Amount GBP"]
+        output_columns = ["Date completed (UTC)", "Description", "Amount GBP"]
         df_output = df_filtered[output_columns].copy()
 
         # Rename columns to lowercase format
-        df_output.columns = ["date", "description", "amount", "balance", "amount gbp"]
-
-        # TODO: Use initial_balance_gbp for GBP balance calculations in future iterations
+        df_output.columns = ["date", "description", "amount gbp"]
 
         # Write to output file
         df_output.to_csv(output_file, index=False)
@@ -137,8 +132,8 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Example usage:
-  python main.py transactions.csv 1000.00
-  python main.py transactions.csv 1500.50 -o output.csv
+  python main.py transactions.csv
+  python main.py transactions.csv -o output.csv
         """
     )
 
@@ -146,12 +141,6 @@ Example usage:
         "input_file",
         type=Path,
         help="Input CSV file from Revolut export"
-    )
-
-    parser.add_argument(
-        "initial_balance",
-        type=float,
-        help="Initial GBP balance for the statement"
     )
 
     parser.add_argument(
@@ -170,7 +159,7 @@ Example usage:
         output_file = args.output
 
     # Process the CSV
-    process_revolut_csv(args.input_file, output_file, args.initial_balance)
+    process_revolut_csv(args.input_file, output_file)
 
 
 if __name__ == "__main__":
