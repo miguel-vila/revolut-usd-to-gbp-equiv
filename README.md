@@ -1,6 +1,6 @@
 # Revolut Extract Generator
 
-A Python script to process Revolut transaction CSV exports for easier reconciliation and accounting.
+A Python script to transform Revolut transaction CSV exports into GBP equivalent transaction statements.
 
 ## Features
 
@@ -24,14 +24,14 @@ uv sync
 
 ### Basic usage (output file auto-generated):
 ```bash
-uv run python main.py transactions.csv
+uv run python main.py transactions.csv 1000.00
 ```
 
-This will create `transactions_processed.csv` in the same directory.
+This will create `transactions_processed.csv` in the same directory, starting with an initial GBP balance of 1000.00.
 
 ### Specify output file:
 ```bash
-uv run python main.py transactions.csv -o output.csv
+uv run python main.py transactions.csv 1500.50 -o output.csv
 ```
 
 ### Get help:

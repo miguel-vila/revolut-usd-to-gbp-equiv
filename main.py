@@ -24,13 +24,14 @@ COLUMNS_TO_KEEP = [
 ]
 
 
-def process_revolut_csv(input_file: Path, output_file: Path) -> None:
+def process_revolut_csv(input_file: Path, output_file: Path, initial_balance_gbp: float) -> None:
     """
-    Process Revolut CSV export, filtering to specific columns.
+    Process Revolut CSV export, transforming to GBP equivalent statement.
 
     Args:
         input_file: Path to the input CSV file
         output_file: Path to the output CSV file
+        initial_balance_gbp: Initial GBP balance for the statement
     """
     try:
         # Read the CSV file
@@ -52,6 +53,8 @@ def process_revolut_csv(input_file: Path, output_file: Path) -> None:
         # Sort by date, oldest first
         df_filtered = df_filtered.sort_values("Date completed (UTC)", ascending=True)
 
+        # TODO: Use initial_balance_gbp for GBP balance calculations in future iterations
+
         # Write to output file
         df_filtered.to_csv(output_file, index=False)
 
@@ -71,12 +74,12 @@ def process_revolut_csv(input_file: Path, output_file: Path) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Process Revolut CSV exports for reconciliation",
+        description="Transform Revolut CSV exports to GBP equivalent statements",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Example usage:
-  python main.py transactions.csv
-  python main.py transactions.csv -o output.csv
+  python main.py transactions.csv 1000.00
+  python main.py transactions.csv 1500.50 -o output.csv
         """
     )
 
@@ -84,6 +87,12 @@ Example usage:
         "input_file",
         type=Path,
         help="Input CSV file from Revolut export"
+    )
+
+    parser.add_argument(
+        "initial_balance",
+        type=float,
+        help="Initial GBP balance for the statement"
     )
 
     parser.add_argument(
@@ -102,7 +111,7 @@ Example usage:
         output_file = args.output
 
     # Process the CSV
-    process_revolut_csv(args.input_file, output_file)
+    process_revolut_csv(args.input_file, output_file, args.initial_balance)
 
 
 if __name__ == "__main__":
