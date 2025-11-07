@@ -59,6 +59,19 @@ The script is designed to be easily extended with:
 - Data validation and cleaning
 - Custom business logic
 
+## Modules
+
+### main.py
+Main script for processing Revolut CSV exports with column filtering and sorting.
+
+### exchange_rate_client.py
+Standalone client for fetching daily exchange rates to GBP using the Frankfurter API (European Central Bank data). Uses only Python standard library (no external dependencies).
+
+Can be tested independently:
+```bash
+uv run python exchange_rate_client.py
+```
+
 ## Development
 
 To modify which columns are kept, edit the `COLUMNS_TO_KEEP` list in `main.py`:
