@@ -106,6 +106,9 @@ def process_revolut_csv(input_file: Path, output_file: Path) -> None:
         output_columns = ["Date completed (UTC)", "Description", "Amount GBP"]
         df_output = df_filtered[output_columns].copy()
 
+        # Format date as dd/mm/yyyy
+        df_output["Date completed (UTC)"] = df_output["Date completed (UTC)"].dt.strftime("%d/%m/%Y")
+
         # Rename columns to lowercase format
         df_output.columns = ["date", "description", "amount gbp"]
 

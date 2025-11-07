@@ -48,7 +48,7 @@ uv run python main.py --help
 
 The script produces a clean CSV with the following columns:
 
-1. **date** - Transaction date
+1. **date** - Transaction date (formatted as dd/mm/yyyy)
 2. **description** - Transaction description
 3. **amount gbp** - Transaction amount converted to GBP (rounded to 2 decimal places)
 
