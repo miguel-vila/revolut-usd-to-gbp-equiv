@@ -5,6 +5,7 @@ A Python script to process Revolut transaction CSV exports for easier reconcilia
 ## Features
 
 - Filters Revolut CSV exports to keep only relevant columns
+- Sorts transactions by date (oldest first)
 - Handles missing columns gracefully with clear error messages
 - Automatically generates output filename with `_processed` suffix
 - Built with pandas for reliable CSV processing

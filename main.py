@@ -46,6 +46,12 @@ def process_revolut_csv(input_file: Path, output_file: Path) -> None:
         # Filter to only the columns we want
         df_filtered = df[COLUMNS_TO_KEEP]
 
+        # Convert date column to datetime for proper sorting
+        df_filtered["Date completed (UTC)"] = pd.to_datetime(df_filtered["Date completed (UTC)"])
+
+        # Sort by date, oldest first
+        df_filtered = df_filtered.sort_values("Date completed (UTC)", ascending=True)
+
         # Write to output file
         df_filtered.to_csv(output_file, index=False)
 
