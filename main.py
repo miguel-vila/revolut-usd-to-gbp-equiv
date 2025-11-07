@@ -10,6 +10,9 @@ import argparse
 import sys
 from pathlib import Path
 import pandas as pd
+import numpy as np
+
+from exchange_rate_client import get_exchange_rate_to_gbp, ExchangeRateError
 
 
 # Columns to keep from the original Revolut CSV
@@ -20,8 +23,48 @@ COLUMNS_TO_KEEP = [
     "Orig amount",
     "Amount",
     "Balance",
-    "Exchange rate",
 ]
+
+
+def calculate_gbp_amount(row) -> float:
+    """
+    Calculate the GBP equivalent amount for a transaction.
+
+    Logic:
+    - If Orig currency is GBP: Use Orig amount with sign from Amount
+    - Otherwise: Convert USD Amount to GBP using exchange rate for that date
+
+    Args:
+        row: A pandas Series representing a transaction row
+
+    Returns:
+        The transaction amount in GBP
+    """
+    orig_currency = row["Orig currency"]
+    orig_amount = row["Orig amount"]
+    amount = row["Amount"]
+    transaction_date = row["Date completed (UTC)"]
+
+    # Case 1: Transaction originally in GBP
+    if orig_currency == "GBP":
+        # Use the original GBP amount, but apply the sign from Amount
+        # This handles currency exchanges where signs may differ
+        if amount >= 0:
+            return abs(orig_amount)
+        else:
+            return -abs(orig_amount)
+
+    # Case 2: Transaction in any other currency (USD, COP, EUR, etc.)
+    # Amount is already in USD, so convert USD to GBP
+    try:
+        # Convert date to string format YYYY-MM-DD
+        date_str = transaction_date.strftime("%Y-%m-%d")
+        usd_to_gbp_rate = get_exchange_rate_to_gbp("USD", date_str)
+        return amount * usd_to_gbp_rate
+    except ExchangeRateError as e:
+        print(f"Warning: Could not fetch exchange rate for {date_str}: {e}", file=sys.stderr)
+        print(f"  Using 0.0 for Amount GBP. Please check this transaction manually.", file=sys.stderr)
+        return 0.0
 
 
 def process_revolut_csv(input_file: Path, output_file: Path, initial_balance_gbp: float) -> None:
@@ -45,13 +88,17 @@ def process_revolut_csv(input_file: Path, output_file: Path, initial_balance_gbp
             sys.exit(1)
 
         # Filter to only the columns we want
-        df_filtered = df[COLUMNS_TO_KEEP]
+        df_filtered = df[COLUMNS_TO_KEEP].copy()
 
         # Convert date column to datetime for proper sorting
         df_filtered["Date completed (UTC)"] = pd.to_datetime(df_filtered["Date completed (UTC)"])
 
         # Sort by date, oldest first
         df_filtered = df_filtered.sort_values("Date completed (UTC)", ascending=True)
+
+        # Calculate GBP amount for each transaction
+        print("Calculating GBP amounts...")
+        df_filtered["Amount GBP"] = df_filtered.apply(calculate_gbp_amount, axis=1)
 
         # TODO: Use initial_balance_gbp for GBP balance calculations in future iterations
 

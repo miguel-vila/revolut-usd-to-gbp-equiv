@@ -4,6 +4,10 @@ A Python script to transform Revolut transaction CSV exports into GBP equivalent
 
 ## Features
 
+- **GBP Conversion**: Automatically converts all transactions to GBP equivalents
+  - Uses daily exchange rates from Frankfurter API (European Central Bank data)
+  - Smart handling: GBP transactions use original amount, others converted via USD→GBP
+  - Works with multi-currency transactions (USD, EUR, COP, etc.)
 - Filters Revolut CSV exports to keep only relevant columns
 - Sorts transactions by date (oldest first)
 - Handles missing columns gracefully with clear error messages
@@ -39,17 +43,17 @@ uv run python main.py transactions.csv 1500.50 -o output.csv
 uv run python main.py --help
 ```
 
-## Columns Kept
+## Output Columns
 
-The script filters the Revolut CSV to keep only these columns:
+The script produces a CSV with the following columns:
 
-1. Date completed (UTC)
-2. Description
-3. Orig currency
-4. Orig amount
-5. Amount
-6. Balance
-7. Exchange rate
+1. **Date completed (UTC)** - Transaction date
+2. **Description** - Transaction description
+3. **Orig currency** - Original transaction currency
+4. **Orig amount** - Original transaction amount
+5. **Amount** - Transaction amount in USD (account currency)
+6. **Balance** - Account balance in USD
+7. **Amount GBP** - Transaction amount converted to GBP (newly calculated)
 
 ## Future Enhancements
 
