@@ -1,6 +1,6 @@
 # Revolut Extract Generator
 
-A Python script to transform Revolut transaction CSV exports into GBP equivalent transaction statements.
+A Python script to transform Revolut transaction (in USD) CSV exports into GBP equivalent transaction statements.
 
 ## Features
 
