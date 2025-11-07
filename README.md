@@ -45,15 +45,13 @@ uv run python main.py --help
 
 ## Output Columns
 
-The script produces a CSV with the following columns:
+The script produces a clean CSV with the following columns (all numeric values rounded to 2 decimal places):
 
-1. **Date completed (UTC)** - Transaction date
-2. **Description** - Transaction description
-3. **Orig currency** - Original transaction currency
-4. **Orig amount** - Original transaction amount
-5. **Amount** - Transaction amount in USD (account currency)
-6. **Balance** - Account balance in USD
-7. **Amount GBP** - Transaction amount converted to GBP (newly calculated)
+1. **date** - Transaction date
+2. **description** - Transaction description
+3. **amount** - Transaction amount in USD (account currency)
+4. **balance** - Account balance in USD
+5. **amount gbp** - Transaction amount converted to GBP
 
 ## Future Enhancements
 

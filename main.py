@@ -100,10 +100,22 @@ def process_revolut_csv(input_file: Path, output_file: Path, initial_balance_gbp
         print("Calculating GBP amounts...")
         df_filtered["Amount GBP"] = df_filtered.apply(calculate_gbp_amount, axis=1)
 
+        # Round numeric columns to 2 decimal places
+        df_filtered["Amount"] = df_filtered["Amount"].round(2)
+        df_filtered["Balance"] = df_filtered["Balance"].round(2)
+        df_filtered["Amount GBP"] = df_filtered["Amount GBP"].round(2)
+
+        # Select only the columns we want in the output
+        output_columns = ["Date completed (UTC)", "Description", "Amount", "Balance", "Amount GBP"]
+        df_output = df_filtered[output_columns].copy()
+
+        # Rename columns to lowercase format
+        df_output.columns = ["date", "description", "amount", "balance", "amount gbp"]
+
         # TODO: Use initial_balance_gbp for GBP balance calculations in future iterations
 
         # Write to output file
-        df_filtered.to_csv(output_file, index=False)
+        df_output.to_csv(output_file, index=False)
 
         print(f"Successfully processed {len(df_filtered)} transactions")
         print(f"Output written to: {output_file}")
